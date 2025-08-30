@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Produits</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #111; color: #f5f5f5; padding: 20px; }
+    h1 { color: #ff4444; }
+    ul { list-style: none; padding: 0; }
+    li { background: #222; padding: 10px; margin: 5px 0; border-radius: 5px; display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <h1>📦 Produits</h1>
+  <ul id="produits"></ul>
+
+  <h2>➕ Ajouter un produit</h2>
+  <form id="ajouterForm">
+    <input type="text" name="categorie" placeholder="Catégorie" required>
+    <input type="text" name="nom" placeholder="Nom du produit" required>
+    <input type="number" name="prix" placeholder="Prix" required>
+    <button type="submit">Ajouter</button>
+  </form>
+
+  <script>
+    const API_URL = "https://ton-api-production.up.railway.app/api/produits";
+
+    function chargerProduits() {
+      fetch(API_URL)
+        .then(r => r.json())
+        .then(data => {
+          const ul = document.getElementById("produits");
+          ul.innerHTML = "";
+          Object.keys(data).forEach(cat => {
+            data[cat].forEach(([nom, prix]) => {
+              const li = document.createElement("li");
+              li.innerHTML = `<span>${cat} - ${nom}</span><strong>${prix}K</strong>`;
+              ul.appendChild(li);
+            });
+          });
+        });
+    }
+
+    // Ajouter produit
+    document.getElementById("ajouterForm").addEventListener("submit", e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      fetch("https://ton-api-production.up.railway.app/admin", {
+        method: "POST",
+        body: formData
+      }).then(() => chargerProduits());
+    });
+
+    chargerProduits();
+  </script>
+</body>
+</html>
